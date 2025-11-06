@@ -76,7 +76,7 @@ if section == "Ratios":
 if section == "Valuation":
     st.title("DCF Valuation")
 
-    last_fcf = cf["Operating Activities"].iloc[-1] - cf["Capital Expenditures"].iloc[-1]
+    last_fcf = cf["Operating Cash Flow"].iloc[-1] - cf["Capital Expenditures"].iloc[-1]
     discount_rate = 0.08
     growth_rate = 0.05
     years = 5
