@@ -140,7 +140,7 @@ styled_income = income.style.set_table_styles([
 ]).highlight_max(color='lightgreen').highlight_min(color='salmon')
 
 st.write("### Income Statement")
-st.write(styled_income.to_html(), unsafe_allow_html=Tr
+st.write(styled_income.to_html(), unsafe_allow_html=True)
 
 
 
