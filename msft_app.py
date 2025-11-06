@@ -13,7 +13,27 @@ import matplotlib.pyplot as plt
 
 
 # In[3]:
+# Sidebar file upload
+st.sidebar.write("### Upload Your Financial Data")
+uploaded_cashflow = st.sidebar.file_uploader("Upload Cash Flow CSV", type=["csv"])
+uploaded_income = st.sidebar.file_uploader("Upload Income Statement CSV", type=["csv"])
+uploaded_balance = st.sidebar.file_uploader("Upload Balance Sheet CSV", type=["csv"])
 
+# Load data: use uploaded files if provided, else default
+if uploaded_cashflow:
+    cf = pd.read_csv(uploaded_cashflow)
+else:
+    cf = pd.read_csv("msft_cashflow.csv")
+
+if uploaded_income:
+    income = pd.read_csv(uploaded_income)
+else:
+    income = pd.read_csv("msft_income_statement.csv")
+
+if uploaded_balance:
+    bs = pd.read_csv(uploaded_balance)
+else:
+    bs = pd.read_csv("msft_balance_sheet.csv")
 
 
 income = pd.read_csv("msft_income_statement.csv", index_col=0)
