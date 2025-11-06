@@ -68,7 +68,7 @@ with tab1:
 st.write("### Key Metrics")
 st.metric("Revenue", f"${income['Total Revenue'].iloc[-1]:,.0f}")
 st.metric("Net Income", f"${income['Net Income'].iloc[-1]:,.0f}")
-st.metric("Free Cash Flow", f"${cf['Free Cash Flow'].iloc[-1]:,.0f}")
+
 # ---------------- Ratios Tab ----------------
 with tab2:
     st.title("Financial Ratios")
