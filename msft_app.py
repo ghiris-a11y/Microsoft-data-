@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 
 
-income = pd.read_csv("msft_income.csv", index_col=0)
+income = pd.read_csv("msft_income_statement.csv", index_col=0)
 bs = pd.read_csv("msft_balance_sheet.csv", index_col=0)
 cf = pd.read_csv("msft_cashflow.csv", index_col=0)
 ratios = pd.read_csv("msft_ratios(1).csv", index_col=0)
