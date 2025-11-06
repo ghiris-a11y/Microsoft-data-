@@ -47,7 +47,7 @@ else:
 ratios = pd.read_csv("msft_ratios(1).csv", index_col=0)
 
 # Tabs for navigation
-tab1, tab2, tab3 = st.tabs(["Overview", "Ratios", "Valuation"])
+tab1, tab2, tab3,tab4, tab5, tab6 = st.tabs(["Overview", "Ratios","DCF", "Multiples", "Dividend Model", "Scenario Analysis"])
 
 income = pd.read_csv("msft_income_statement.csv", index_col=0)
 bs = pd.read_csv("msft_balance_sheet.csv", index_col=0)
@@ -99,40 +99,99 @@ with tab2:
     - **Asset Turnover**: Stable ratio indicates efficient asset utilization.
     """)
 
-# ---------------- Valuation Tab ----------------
+
+# ---------------- DCF ----------------
 with tab3:
-    st.title("DCF Valuation")
+    st.subheader("Discounted Cash Flow (DCF)")
+    cf = cf.dropna(subset=["Free Cash Flow"])
+    last_fcf = cf["Free Cash Flow"].iloc[-1] / 1_000_000_000  # Convert to billions
 
-    try:
-        cf = cf.dropna(subset=["Free Cash Flow"])
-        last_fcf = cf["Free Cash Flow"].iloc[-1] / 1_000_000_000  # Convert to billions
+    discount_rate = st.slider("Discount Rate", 0.05, 0.15, 0.10)
+    growth_rate = st.slider("Growth Rate", 0.01, 0.08, 0.03)
+    years = st.slider("Projection Years", 3, 10, 5)
 
-        discount_rate = 0.10  # 10%
-        growth_rate = 0.03    # 3%
-        years = 5
+    projected_fcfs = [last_fcf * ((1 + growth_rate) ** i) for i in range(1, years + 1)]
+    discounted_fcfs = [fcf / ((1 + discount_rate) ** i) for i, fcf in enumerate(projected_fcfs, 1)]
+    terminal_value = projected_fcfs[-1] * (1 + growth_rate) / (discount_rate - growth_rate)
+    discounted_terminal = terminal_value / ((1 + discount_rate) ** years)
+    dcf_value = sum(discounted_fcfs) + discounted_terminal
 
-        projected_fcfs = [last_fcf * ((1 + growth_rate) ** i) for i in range(1, years + 1)]
-        discounted_fcfs = [fcf / ((1 + discount_rate) ** i) for i, fcf in enumerate(projected_fcfs, 1)]
+    st.metric("Estimated DCF Value", f"${dcf_value:,.2f} Billion")
 
-        terminal_value = projected_fcfs[-1] * (1 + growth_rate) / (discount_rate - growth_rate)
-        discounted_terminal = terminal_value / ((1 + discount_rate) ** years)
+    # Interpretation
+    st.write("### Interpretation")
+    st.write(f"""
+    Under the assumptions of a {discount_rate*100:.0f}% discount rate and {growth_rate*100:.0f}% growth rate,
+    Microsoft's intrinsic value is estimated at **${dcf_value:,.2f} Billion**.
 
-        dcf_value = sum(discounted_fcfs) + discounted_terminal
-        st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f} Billion")
+    - **Current Market Cap**: ~3,000 Billion (approx $3 trillion)
+    - **Comparison**: The DCF estimate is slightly below the current market cap, suggesting the stock may be fairly valued or slightly overvalued.
+    - **Sensitivity**: Increasing discount rate or lowering growth would reduce this valuation significantly.
+    """)
 
-        # Interpretation
-        st.write("### Interpretation")
-        st.write(f"""
-        Under the assumptions of a {discount_rate*100:.0f}% discount rate and {growth_rate*100:.0f}% growth rate,
-        Microsoft's intrinsic value is estimated at **${dcf_value:,.2f} Billion**.
+# ---------------- Multiples ----------------
+with tab4:
+    st.subheader("Comparable Multiples")
+    ticker = "MSFT"
+    stock = yf.Ticker(ticker)
+    price = stock.history(period="1d")["Close"].iloc[-1]
+    pe_ratio = stock.info.get("trailingPE", "N/A")
+    pb_ratio = stock.info.get("priceToBook", "N/A")
+    ps_ratio = stock.info.get("priceToSalesTrailing12Months", "N/A")
 
-        - **Current Market Cap**: ~3,000 Billion (approx $3 trillion)
-        - **Comparison**: The DCF estimate is slightly below the current market cap, suggesting the stock may be fairly valued or slightly overvalued.
-        - **Sensitivity**: Increasing discount rate or lowering growth would reduce this valuation significantly.
+    st.write(f"**Current Price:** ${price:,.2f}")
+    st.write(f"**P/E Ratio:** {pe_ratio}")
+    st.write(f"**P/B Ratio:** {pb_ratio}")
+    st.write(f"**P/S Ratio:** {ps_ratio}")
+
+    # Interpretation
+    st.write("### Interpretation")
+    st.write("""
+    - **P/E Ratio**: Indicates how much investors are willing to pay per dollar of earnings. A high P/E suggests growth expectations.
+    - **P/B Ratio**: Shows valuation relative to book value. Lower ratios may indicate undervaluation.
+    - **P/S Ratio**: Useful for companies with volatile earnings; compares price to revenue.
+    """)
+
+# ---------------- Dividend Discount Model ----------------
+with tab5:
+    st.subheader("Dividend Discount Model (DDM)")
+    dividend = stock.info.get("dividendRate", 0)
+    if dividend > 0:
+        ddm_value = dividend * (1 + growth_rate) / (discount_rate - growth_rate)
+        st.metric("Estimated DDM Value", f"${ddm_value:,.2f}")
+        st.write("""
+        Interpretation:
+        - DDM is suitable for dividend-paying companies.
+        - Higher growth or lower discount rate increases valuation.
         """)
-    except Exception as e:
-        st.error(f"Error in DCF calculation: {e}")
+    else:
+        st.warning("Microsoft does not pay significant dividends for DDM valuation.")
 
+# ---------------- Scenario Analysis ----------------
+with tab6:
+    st.subheader("Scenario Analysis")
+    scenarios = {
+        "Best Case": {"growth": 0.05, "discount": 0.08},
+        "Base Case": {"growth": 0.03, "discount": 0.10},
+        "Worst Case": {"growth": 0.01, "discount": 0.12}
+    }
+    results = {}
+    for case, params in scenarios.items():
+        projected_fcfs = [last_fcf * ((1 + params["growth"]) ** i) for i in range(1, years + 1)]
+        discounted_fcfs = [fcf / ((1 + params["discount"]) ** i) for i, fcf in enumerate(projected_fcfs, 1)]
+        terminal_value = projected_fcfs[-1] * (1 + params["growth"]) / (params["discount"] - params["growth"])
+        discounted_terminal = terminal_value / ((1 + params["discount"]) ** years)
+        results[case] = sum(discounted_fcfs) + discounted_terminal
+
+    st.write(pd.DataFrame.from_dict(results, orient="index", columns=["Valuation (Billion $)"]))
+    st.bar_chart(pd.DataFrame.from_dict(results, orient="index"))
+
+    st.write("""
+    Interpretation:
+    - **Best Case** assumes higher growth and lower discount rate → highest valuation.
+    - **Worst Case** assumes lower growth and higher discount rate → lowest valuation.
+    - Scenario analysis helps visualize sensitivity to assumptions.
+    """)
 
 
 
