@@ -14,6 +14,13 @@ import matplotlib.pyplot as plt
 
 # In[3]:
 # Sidebar file upload
+import streamlit as st
+import pandas as pd
+
+# Display Microsoft logo
+st.image("https://logo.clearbit.com/microsoft.com", width=120)
+
+# Sidebar file upload
 st.sidebar.write("### Upload Your Financial Data")
 uploaded_cashflow = st.sidebar.file_uploader("Upload Cash Flow CSV", type=["csv"])
 uploaded_income = st.sidebar.file_uploader("Upload Income Statement CSV", type=["csv"])
@@ -35,39 +42,18 @@ if uploaded_balance:
 else:
     bs = pd.read_csv("msft_balance_sheet.csv")
 
+ratios = pd.read_csv("msft_ratios.csv", index_col=0)
+
+# Tabs for navigation
+tab1, tab2, tab3 = st.tabs(["Overview", "Ratios", "Valuation"])
 
 income = pd.read_csv("msft_income_statement.csv", index_col=0)
 bs = pd.read_csv("msft_balance_sheet.csv", index_col=0)
 cf = pd.read_csv("msft_cashflow.csv", index_col=0)
 ratios = pd.read_csv("msft_ratios(1).csv", index_col=0)
 
-
-# In[6]:
-
-
-
-
-
-# In[7]:
-
-
-
-
-
-
-# In[4]:
-
-
-
-st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["Overview", "Ratios", "Valuation"])
-
-
-# In[5]:
-
-
-
-if section == "Overview":
+# ---------------- Overview Tab ----------------
+with tab1:
     st.title("Microsoft Financial Overview")
     st.write("### Income Statement")
     st.dataframe(income.tail())
@@ -76,12 +62,14 @@ if section == "Overview":
     st.write("### Cash Flow")
     st.dataframe(cf.tail())
 
+    # KPI Cards
+    st.write("### Key Metrics")
+    st.metric("Revenue", f"${income['Total Revenue'].iloc[-1]:,.0f}")
+    st.metric("Net Income", f"${income['Net Income'].iloc[-1]:,.0f}")
+    st.metric("Operating Cash Flow", f"${cf['Operating Cash Flow'].iloc[-1]:,.0f}")
 
-# In[7]:
-
-
-
-if section == "Ratios":
+# ---------------- Ratios Tab ----------------
+with tab2:
     st.title("Financial Ratios")
     st.dataframe(ratios)
 
@@ -89,31 +77,29 @@ if section == "Ratios":
     selected_ratio = st.selectbox("Select a ratio to plot", ratios.columns)
     st.line_chart(ratios[selected_ratio])
 
-    # ✅ Add interpretation text
+    # Download button
+    st.download_button("Download Ratios CSV", ratios.to_csv().encode('utf-8'), "ratios.csv", "text/csv")
+
+    # Interpretation
     st.write("### Interpretation")
     st.write("""
     **Profitability Ratios**:
-    - **Gross Margin**: Indicates how efficiently Microsoft converts revenue into gross profit. A high margin (>60%) shows strong pricing power and cost control.
-    - **Operating Margin**: Reflects operational efficiency. Consistently high margins (>30%) suggest strong core business performance.
-    - **Net Margin**: Shows overall profitability after all expenses. High net margins (>25%) indicate robust financial health.
+    - **Gross Margin**: High margin (>60%) shows strong pricing power and cost control.
+    - **Operating Margin**: Consistently high margins (>30%) suggest strong core business performance.
+    - **Net Margin**: High net margins (>25%) indicate robust financial health.
 
     **Liquidity Ratios**:
-    - **Current Ratio**: Measures short-term solvency. A ratio around 2 means Microsoft can comfortably meet short-term obligations.
+    - **Current Ratio**: Around 2 means Microsoft can comfortably meet short-term obligations.
 
     **Leverage Ratios**:
-    - **Debt-to-Equity**: Indicates financial risk. A low ratio (<1) means Microsoft relies more on equity than debt, reducing risk.
+    - **Debt-to-Equity**: Low ratio (<1) means Microsoft relies more on equity than debt.
 
     **Efficiency Ratios**:
-    - **Asset Turnover**: Shows how effectively assets generate revenue. A stable ratio indicates efficient asset utilization.
-
-    Overall, Microsoft’s ratios suggest strong profitability, healthy liquidity, and conservative leverage, supporting its position as a financially robust company.
+    - **Asset Turnover**: Stable ratio indicates efficient asset utilization.
     """)
 
-
-# In[9]:
-
-
-if section == "Valuation":
+# ---------------- Valuation Tab ----------------
+with tab3:
     st.title("DCF Valuation")
 
     try:
@@ -133,20 +119,20 @@ if section == "Valuation":
         dcf_value = sum(discounted_fcfs) + discounted_terminal
         st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f} Billion")
 
-        # ✅ Add interpretation text
+        # Interpretation
         st.write("### Interpretation")
         st.write(f"""
         Under the assumptions of a {discount_rate*100:.0f}% discount rate and {growth_rate*100:.0f}% growth rate,
         Microsoft's intrinsic value is estimated at **${dcf_value:,.2f} Billion**.
-        
-        - **Current Market Cap**: ~3,000 Billion (approx \$3 trillion)
+
+        - **Current Market Cap**: ~3,000 Billion (approx $3 trillion)
         - **Comparison**: The DCF estimate is slightly below the current market cap, suggesting the stock may be fairly valued or slightly overvalued.
         - **Sensitivity**: Increasing discount rate or lowering growth would reduce this valuation significantly.
         """)
     except Exception as e:
         st.error(f"Error in DCF calculation: {e}")
 
-# In[ ]:
+
 
 
 
