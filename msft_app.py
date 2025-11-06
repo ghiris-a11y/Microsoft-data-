@@ -25,15 +25,14 @@ ratios = pd.read_csv("msft_ratios(1).csv", index_col=0)
 # In[6]:
 
 
-pip install streamlit-jupyter
+
 
 
 # In[7]:
 
 
 
-from streamlit_jupyter import StreamlitPatcher
-StreamlitPatcher().jupyter()
+
 
 
 # In[4]:
