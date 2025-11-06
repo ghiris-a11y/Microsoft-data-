@@ -21,10 +21,10 @@ import pandas as pd
 st.image("https://logo.clearbit.com/microsoft.com", width=120)
 
 # Sidebar file upload
-st.sidebar.write("### Upload Your Financial Data")
-uploaded_cashflow = st.sidebar.file_uploader("Upload Cash Flow CSV", type=["csv"])
-uploaded_income = st.sidebar.file_uploader("Upload Income Statement CSV", type=["csv"])
-uploaded_balance = st.sidebar.file_uploader("Upload Balance Sheet CSV", type=["csv"])
+st.write("### Key Metrics")
+st.metric("Revenue", f"${income['Total Revenue'].iloc[-1]:,.0f}")
+st.metric("Net Income", f"${income['Net Income'].iloc[-1]:,.0f}")
+st.metric("Free Cash Flow", f"${cf['Free Cash Flow'].iloc[-1]:,.0f}")
 
 # Load data: use uploaded files if provided, else default
 if uploaded_cashflow:
