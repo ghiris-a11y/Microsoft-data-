@@ -69,6 +69,26 @@ if section == "Ratios":
     selected_ratio = st.selectbox("Select a ratio to plot", ratios.columns)
     st.line_chart(ratios[selected_ratio])
 
+    # ✅ Add interpretation text
+    st.write("### Interpretation")
+    st.write("""
+    **Profitability Ratios**:
+    - **Gross Margin**: Indicates how efficiently Microsoft converts revenue into gross profit. A high margin (>60%) shows strong pricing power and cost control.
+    - **Operating Margin**: Reflects operational efficiency. Consistently high margins (>30%) suggest strong core business performance.
+    - **Net Margin**: Shows overall profitability after all expenses. High net margins (>25%) indicate robust financial health.
+
+    **Liquidity Ratios**:
+    - **Current Ratio**: Measures short-term solvency. A ratio around 2 means Microsoft can comfortably meet short-term obligations.
+
+    **Leverage Ratios**:
+    - **Debt-to-Equity**: Indicates financial risk. A low ratio (<1) means Microsoft relies more on equity than debt, reducing risk.
+
+    **Efficiency Ratios**:
+    - **Asset Turnover**: Shows how effectively assets generate revenue. A stable ratio indicates efficient asset utilization.
+
+    Overall, Microsoft’s ratios suggest strong profitability, healthy liquidity, and conservative leverage, supporting its position as a financially robust company.
+    """)
+
 
 # In[9]:
 
