@@ -77,8 +77,9 @@ if section == "Valuation":
     st.title("DCF Valuation")
 
     try:
-        # Use Free Cash Flow directly
-        last_fcf = cf["Free Cash Flow"].iloc[-1]
+        # Drop NaN rows and use Free Cash Flow
+        cf = cf.dropna(subset=["Free Cash Flow"])
+        last_fcf = float(cf["Free Cash Flow"].iloc[-1])
 
         discount_rate = 0.08
         growth_rate = 0.05
@@ -94,7 +95,6 @@ if section == "Valuation":
         st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f}")
     except Exception as e:
         st.error(f"Error in DCF calculation: {e}")
-
 
 # In[ ]:
 
