@@ -10,7 +10,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import yfinance as yf
 
 # In[3]:
 # Sidebar file upload
