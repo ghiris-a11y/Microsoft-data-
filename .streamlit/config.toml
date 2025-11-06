@@ -1,8 +1,8 @@
 
 
 [theme]
-primaryColor = "#0078D4"
-backgroundColor = "#0E1117"
-secondaryBackgroundColor = "#262730"
-textColor = "#FAFAFA"
+primaryColor = "#0078D4"                # Microsoft blue for buttons
+backgroundColor = "#E6F0FA"             # Light blue background
+secondaryBackgroundColor = "#FFFFFF"    # White for cards
+textColor = "#000000"                   # Black text
 font = "sans serif"
