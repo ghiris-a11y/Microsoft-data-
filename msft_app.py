@@ -134,13 +134,6 @@ with tab3:
         st.error(f"Error in DCF calculation: {e}")
 
 
-styled_income = income.style.set_table_styles([
-    {'selector': 'thead th', 'props': [('background-color', '#0078D4'), ('color', 'white')]},
-    {'selector': 'tbody td', 'props': [('background-color', '#E6F0FA')]}
-]).highlight_max(color='lightgreen').highlight_min(color='salmon')
-
-st.write("### Income Statement")
-st.write(styled_income.to_html(), unsafe_allow_html=True)
 
 
 
