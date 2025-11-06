@@ -22,7 +22,7 @@ st.image("https://logo.clearbit.com/microsoft.com", width=120)
 
 
 st.markdown(
-    "<h2 style='text-align: center; color: #0078D4; font-family: sans-serif;'>Financial Analysis of Microsoft</h2>",
+    "<h2 style='text-align: left; color: #0078D4; font-family: sans-serif;'>Financial Analysis of Microsoft</h2>",
     
     unsafe_allow_html=True
 )
