@@ -92,6 +92,17 @@ if section == "Valuation":
 
         dcf_value = sum(discounted_fcfs) + discounted_terminal
         st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f} Billion")
+
+        # ✅ Add interpretation text
+        st.write("### Interpretation")
+        st.write(f"""
+        Under the assumptions of a {discount_rate*100:.0f}% discount rate and {growth_rate*100:.0f}% growth rate,
+        Microsoft's intrinsic value is estimated at **${dcf_value:,.2f} Billion**.
+        
+        - **Current Market Cap**: ~3,000 Billion (approx \$3 trillion)
+        - **Comparison**: The DCF estimate is slightly below the current market cap, suggesting the stock may be fairly valued or slightly overvalued.
+        - **Sensitivity**: Increasing discount rate or lowering growth would reduce this valuation significantly.
+        """)
     except Exception as e:
         st.error(f"Error in DCF calculation: {e}")
 
