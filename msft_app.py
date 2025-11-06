@@ -42,7 +42,7 @@ if uploaded_balance:
 else:
     bs = pd.read_csv("msft_balance_sheet.csv")
 
-ratios = pd.read_csv("msft_ratios.csv", index_col=0)
+ratios = pd.read_csv("msft_ratios(1).csv", index_col=0)
 
 # Tabs for navigation
 tab1, tab2, tab3 = st.tabs(["Overview", "Ratios", "Valuation"])
