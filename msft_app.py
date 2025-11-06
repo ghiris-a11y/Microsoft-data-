@@ -76,20 +76,24 @@ if section == "Ratios":
 if section == "Valuation":
     st.title("DCF Valuation")
 
-    last_fcf = cf["Operating Cash Flow"].iloc[-1] - abs(cf["Capital Expenditure"].iloc[-1])
-    discount_rate = 0.08
-    growth_rate = 0.05
-    years = 5
+    try:
+        # Use Free Cash Flow directly
+        last_fcf = cf["Free Cash Flow"].iloc[-1]
 
-    projected_fcfs = [last_fcf * ((1 + growth_rate) ** i) for i in range(1, years + 1)]
-    discounted_fcfs = [fcf / ((1 + discount_rate) ** i) for i, fcf in enumerate(projected_fcfs, 1)]
+        discount_rate = 0.08
+        growth_rate = 0.05
+        years = 5
 
-    terminal_value = projected_fcfs[-1] * (1 + growth_rate) / (discount_rate - growth_rate)
-    discounted_terminal = terminal_value / ((1 + discount_rate) ** years)
+        projected_fcfs = [last_fcf * ((1 + growth_rate) ** i) for i in range(1, years + 1)]
+        discounted_fcfs = [fcf / ((1 + discount_rate) ** i) for i, fcf in enumerate(projected_fcfs, 1)]
 
-    dcf_value = sum(discounted_fcfs) + discounted_terminal
+        terminal_value = projected_fcfs[-1] * (1 + growth_rate) / (discount_rate - growth_rate)
+        discounted_terminal = terminal_value / ((1 + discount_rate) ** years)
 
-    st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f}")
+        dcf_value = sum(discounted_fcfs) + discounted_terminal
+        st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f}")
+    except Exception as e:
+        st.error(f"Error in DCF calculation: {e}")
 
 
 # In[ ]:
