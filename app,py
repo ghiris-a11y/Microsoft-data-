@@ -1,0 +1,112 @@
+import streamlit as st
+import pandas as pd
+
+# Display Microsoft logo
+st.image("https://logo.clearbit.com/microsoft.com", width=120)
+
+# Sidebar file upload
+st.sidebar.write("### Upload Your Financial Data")
+uploaded_cashflow = st.sidebar.file_uploader("Upload Cash Flow CSV", type=["csv"])
+uploaded_income = st.sidebar.file_uploader("Upload Income Statement CSV", type=["csv"])
+uploaded_balance = st.sidebar.file_uploader("Upload Balance Sheet CSV", type=["csv"])
+
+# Load data: use uploaded files if provided, else default
+if uploaded_cashflow:
+    cf = pd.read_csv(uploaded_cashflow)
+else:
+    cf = pd.read_csv("msft_cashflow.csv")
+
+if uploaded_income:
+    income = pd.read_csv(uploaded_income)
+else:
+    income = pd.read_csv("msft_income_statement.csv")
+
+if uploaded_balance:
+    bs = pd.read_csv(uploaded_balance)
+else:
+    bs = pd.read_csv("msft_balance_sheet.csv")
+
+ratios = pd.read_csv("msft_ratios.csv", index_col=0)
+
+# Tabs for navigation
+tab1, tab2, tab3 = st.tabs(["Overview", "Ratios", "Valuation"])
+
+# ---------------- Overview Tab ----------------
+with tab1:
+    st.title("Microsoft Financial Overview")
+    st.write("### Income Statement")
+    st.dataframe(income.tail())
+    st.write("### Balance Sheet")
+    st.dataframe(bs.tail())
+    st.write("### Cash Flow")
+    st.dataframe(cf.tail())
+
+    # KPI Cards
+    st.write("### Key Metrics")
+    st.metric("Revenue", f"${income['Total Revenue'].iloc[-1]:,.0f}")
+    st.metric("Net Income", f"${income['Net Income'].iloc[-1]:,.0f}")
+    st.metric("Operating Cash Flow", f"${cf['Operating Cash Flow'].iloc[-1]:,.0f}")
+
+# ---------------- Ratios Tab ----------------
+with tab2:
+    st.title("Financial Ratios")
+    st.dataframe(ratios)
+
+    st.write("### Ratio Trends")
+    selected_ratio = st.selectbox("Select a ratio to plot", ratios.columns)
+    st.line_chart(ratios[selected_ratio])
+
+    # Download button
+    st.download_button("Download Ratios CSV", ratios.to_csv().encode('utf-8'), "ratios.csv", "text/csv")
+
+    # Interpretation
+    st.write("### Interpretation")
+    st.write("""
+    **Profitability Ratios**:
+    - **Gross Margin**: High margin (>60%) shows strong pricing power and cost control.
+    - **Operating Margin**: Consistently high margins (>30%) suggest strong core business performance.
+    - **Net Margin**: High net margins (>25%) indicate robust financial health.
+
+    **Liquidity Ratios**:
+    - **Current Ratio**: Around 2 means Microsoft can comfortably meet short-term obligations.
+
+    **Leverage Ratios**:
+    - **Debt-to-Equity**: Low ratio (<1) means Microsoft relies more on equity than debt.
+
+    **Efficiency Ratios**:
+    - **Asset Turnover**: Stable ratio indicates efficient asset utilization.
+    """)
+
+# ---------------- Valuation Tab ----------------
+with tab3:
+    st.title("DCF Valuation")
+
+    try:
+        cf = cf.dropna(subset=["Free Cash Flow"])
+        last_fcf = cf["Free Cash Flow"].iloc[-1] / 1_000_000_000  # Convert to billions
+
+        discount_rate = 0.10  # 10%
+        growth_rate = 0.03    # 3%
+        years = 5
+
+        projected_fcfs = [last_fcf * ((1 + growth_rate) ** i) for i in range(1, years + 1)]
+        discounted_fcfs = [fcf / ((1 + discount_rate) ** i) for i, fcf in enumerate(projected_fcfs, 1)]
+
+        terminal_value = projected_fcfs[-1] * (1 + growth_rate) / (discount_rate - growth_rate)
+        discounted_terminal = terminal_value / ((1 + discount_rate) ** years)
+
+        dcf_value = sum(discounted_fcfs) + discounted_terminal
+        st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f} Billion")
+
+        # Interpretation
+        st.write("### Interpretation")
+        st.write(f"""
+        Under the assumptions of a {discount_rate*100:.0f}% discount rate and {growth_rate*100:.0f}% growth rate,
+        Microsoft's intrinsic value is estimated at **${dcf_value:,.2f} Billion**.
+
+        - **Current Market Cap**: ~3,000 Billion (approx $3 trillion)
+        - **Comparison**: The DCF estimate is slightly below the current market cap, suggesting the stock may be fairly valued or slightly overvalued.
+        - **Sensitivity**: Increasing discount rate or lowering growth would reduce this valuation significantly.
+        """)
+    except Exception as e:
+        st.error(f"Error in DCF calculation: {e}")
