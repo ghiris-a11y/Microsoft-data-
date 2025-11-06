@@ -21,10 +21,12 @@ import pandas as pd
 st.image("https://logo.clearbit.com/microsoft.com", width=120)
 
 # Sidebar file upload
-st.write("### Key Metrics")
-st.metric("Revenue", f"${income['Total Revenue'].iloc[-1]:,.0f}")
-st.metric("Net Income", f"${income['Net Income'].iloc[-1]:,.0f}")
-st.metric("Free Cash Flow", f"${cf['Free Cash Flow'].iloc[-1]:,.0f}")
+
+st.sidebar.write("### Upload Your Financial Data")
+uploaded_cashflow = st.sidebar.file_uploader("Upload Cash Flow CSV", type=["csv"])
+uploaded_income = st.sidebar.file_uploader("Upload Income Statement CSV", type=["csv"])
+uploaded_balance = st.sidebar.file_uploader("Upload Balance Sheet CSV", type=["csv"]
+
 
 # Load data: use uploaded files if provided, else default
 if uploaded_cashflow:
@@ -63,11 +65,10 @@ with tab1:
     st.dataframe(cf.tail())
 
     # KPI Cards
-    st.write("### Key Metrics")
-    st.metric("Revenue", f"${income['Total Revenue'].iloc[-1]:,.0f}")
-    st.metric("Net Income", f"${income['Net Income'].iloc[-1]:,.0f}")
-    st.metric("Operating Cash Flow", f"${cf['Operating Cash Flow'].iloc[-1]:,.0f}")
-
+st.write("### Key Metrics")
+st.metric("Revenue", f"${income['Total Revenue'].iloc[-1]:,.0f}")
+st.metric("Net Income", f"${income['Net Income'].iloc[-1]:,.0f}")
+st.metric("Free Cash Flow", f"${cf['Free Cash Flow'].iloc[-1]:,.0f}")
 # ---------------- Ratios Tab ----------------
 with tab2:
     st.title("Financial Ratios")
