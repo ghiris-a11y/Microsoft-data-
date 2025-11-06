@@ -25,7 +25,7 @@ st.image("https://logo.clearbit.com/microsoft.com", width=120)
 st.sidebar.write("### Upload Your Financial Data")
 uploaded_cashflow = st.sidebar.file_uploader("Upload Cash Flow CSV", type=["csv"])
 uploaded_income = st.sidebar.file_uploader("Upload Income Statement CSV", type=["csv"])
-uploaded_balance = st.sidebar.file_uploader("Upload Balance Sheet CSV", type=["csv"]
+uploaded_balance = st.sidebar.file_uploader("Upload Balance Sheet CSV", type=["csv"])
 
 
 # Load data: use uploaded files if provided, else default
