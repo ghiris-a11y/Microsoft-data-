@@ -4,9 +4,6 @@
 # In[2]:
 
 
-pip install --upgrade numpy pandas matplotlib scipy --user
-
-
 # In[2]:
 
 
