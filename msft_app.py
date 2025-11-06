@@ -77,12 +77,11 @@ if section == "Valuation":
     st.title("DCF Valuation")
 
     try:
-        # Drop NaN rows and use Free Cash Flow
         cf = cf.dropna(subset=["Free Cash Flow"])
-        last_fcf = float(cf["Free Cash Flow"].iloc[-1])
+        last_fcf = cf["Free Cash Flow"].iloc[-1] / 1_000_000_000  # Convert to billions
 
-        discount_rate = 0.08
-        growth_rate = 0.05
+        discount_rate = 0.10  # 10%
+        growth_rate = 0.03    # 3%
         years = 5
 
         projected_fcfs = [last_fcf * ((1 + growth_rate) ** i) for i in range(1, years + 1)]
@@ -92,7 +91,7 @@ if section == "Valuation":
         discounted_terminal = terminal_value / ((1 + discount_rate) ** years)
 
         dcf_value = sum(discounted_fcfs) + discounted_terminal
-        st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f}")
+        st.metric(label="Estimated DCF Value", value=f"${dcf_value:,.2f} Billion")
     except Exception as e:
         st.error(f"Error in DCF calculation: {e}")
 
